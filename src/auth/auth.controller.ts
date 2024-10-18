@@ -1,10 +1,8 @@
-import { BadRequestException, Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { LogoutDto } from './dto/logout.dto';
 import { TokenService } from '../token/token.service';
 import { UsersService } from '../users/users.service';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -52,18 +50,15 @@ export class AuthController {
 
     @ApiOperation({ summary: 'Логаут користувача' })
     @ApiResponse({ status: 201 })
-    @Post('logout')
-    async logout(@Body() body: LogoutDto, @Res() res: Response) {
-        if (!body) {
-            res.sendStatus(HttpStatus.NO_CONTENT);
-            return;
-        }
+    @Get('logout')
+    async logout(@Headers('authorization') authHeader: string) {
+        const token = authHeader.split(' ')[1];
         try {
-            const findToken = await this.tokenService.getByName(body.token);
-            await this.tokenService.deleteToken(body.token);
+            const findToken = await this.tokenService.getByName(token);
+            await this.tokenService.deleteToken(token);
             const user = await this.usersService.getUserByIdToken(findToken._id);
             await this.usersService.deleteToken(user._id);
-            res.status(201).send({ token: '' });
+            return { message: 'Logout success' };
         } catch (e) {
             throw new BadRequestException(e);
         }
