@@ -1,0 +1,39 @@
+name: ci-send-my-pdf
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+      - main
+      - 'release/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.17.0'
+      - name: Install dependencies
+        run: npm install
+      - name: Run prettier
+        run: npm run prettier:fix
+      - name: Run eslint
+        run: npm run lint:fix
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.17.0'
+      - name: Install dependencies
+        run: npm install
+      - name: build production project
+        run: npm run build
