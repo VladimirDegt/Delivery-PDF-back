@@ -1,4 +1,4 @@
-name: ci-send-my-pdf
+name: ci-delivery-my-pdf
 
 on:
   push:

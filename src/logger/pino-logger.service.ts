@@ -1,5 +1,6 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import pino from 'pino';
+import 'pino-pretty';
 
 const pinoConfig = pino({
     transport: {

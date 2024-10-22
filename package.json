@@ -32,7 +32,7 @@
     "nodemailer-express-handlebars": "^6.1.2",
     "pdf-parse": "^1.1.1",
     "pino": "^9.4.0",
-    "pino-pretty": "^11.2.2",
+    "pino-pretty": "^11.3.0",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1"
