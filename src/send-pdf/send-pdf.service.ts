@@ -8,10 +8,9 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { validateFile } from '../utils/validate-file';
 import { logger } from '../logger/pino-logger.service';
-import { sendEmailGmail } from '../utils/send-email-gmail';
 import { Act, ActDocument } from './send-pdf.schema';
 import { ISendEmail } from '../utils/types/sendEmail';
-import { sendEmailKPMIC } from '../utils/send-email-kpmic';
+import { sendEmailGmail } from '../utils/send-email-gmail';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse');
@@ -32,6 +31,7 @@ export class SendPdfService {
         }
 
         const writeFileAsync = promisify(fs.writeFile);
+        const unlinkFileAsync = promisify(fs.unlink);
 
         try {
             const filePath = path.join('./src/public/files', decodedFileName);
@@ -41,6 +41,8 @@ export class SendPdfService {
 
             const regexEmail = /e-mail: ([^\s]+)/;
             const matchEmail = textPDF.match(regexEmail);
+
+            await unlinkFileAsync(filePath);
 
             return {
                 result: matchEmail[1],
@@ -56,36 +58,19 @@ export class SendPdfService {
         }
     }
 
-    async sendEmail({ file, fileName, emailTo, emailFrom, password, user }: ISendEmail) {
-        if (emailFrom === process.env.GMAIL) {
-            try {
-                await sendEmailGmail(file, fileName, emailTo);
-                const act = new this.actRepository({
-                    emailTo,
-                    emailFrom,
-                    fileName,
-                    result: 'Sending successful',
-                    user,
-                });
-                return act.save();
-            } catch (e) {
-                logger.log(`sendEmail: ${e}`, 'function sendEmailGmail');
-            }
-        } else {
-            try {
-                await sendEmailKPMIC({ file, fileName, emailTo, emailFrom, password, user });
-                const act = new this.actRepository({
-                    emailTo,
-                    emailFrom,
-                    fileName,
-                    result: 'Sending successful',
-                    user,
-                });
-                return act.save();
-            } catch (e) {
-                logger.log(`sendEmail: ${e}`, 'function sendEmailKPMIC');
-                throw new BadRequestException({ message: 'Invalid password kpmic' });
-            }
+    async sendEmail({ file, fileName, emailTo, textEmail, user }: ISendEmail) {
+        try {
+            await sendEmailGmail(file, fileName, emailTo, textEmail);
+            const act = new this.actRepository({
+                emailTo,
+                textEmail,
+                fileName,
+                result: 'Sending successful',
+                user,
+            });
+            return act.save();
+        } catch (e) {
+            logger.log(`sendEmail: ${e}`, 'function sendEmailGmail');
         }
     }
 }

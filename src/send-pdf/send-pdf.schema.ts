@@ -27,11 +27,11 @@ export class Act {
     emailTo: string;
 
     @ApiProperty({
-        example: 'example@gmail.com',
-        description: 'Email sender',
+        example: 'Hello!',
+        description: 'Text email',
     })
     @Prop()
-    emailFrom: string;
+    textEmail: string;
 
     @ApiProperty({ example: 'Аct_email_first', description: 'file name' })
     @Prop()

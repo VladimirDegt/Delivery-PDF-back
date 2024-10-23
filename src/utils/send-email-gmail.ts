@@ -1,5 +1,4 @@
 import * as process from 'process';
-import * as path from 'path';
 import { logger } from '../logger/pino-logger.service';
 import { config } from 'dotenv';
 
@@ -8,9 +7,13 @@ config();
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 const nodemailer = require('nodemailer');
-const hbs = require('nodemailer-express-handlebars');
 
-export async function sendEmailGmail(file: Express.Multer.File, fileName: string, emailTo: string) {
+export async function sendEmailGmail(
+    file: Express.Multer.File,
+    fileName: string,
+    emailTo: string,
+    textEmail: string
+) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -19,38 +22,16 @@ export async function sendEmailGmail(file: Express.Multer.File, fileName: string
         },
     });
 
-    const handlebarOptions = {
-        viewEngine: {
-            extName: '.html',
-            partialsDir: path.resolve('src/utils/views'),
-            defaultLayout: false,
-        },
-        viewPath: path.resolve('src/utils/views'),
-        extName: '.handlebars',
-    };
-
-    transporter.use('compile', hbs(handlebarOptions));
-
-    const additionalFilePath = path.resolve(
-        'src/public/files/instruction/Інструкція підписання документа за допомогою Дії.docx'
-    );
-
     const mailOptions = {
         from: `${process.env.SENDER_NAME} <${process.env.GMAIL}>`,
         to: emailTo,
-        subject: `Лист від КП МІЦ`,
-        template: 'email',
+        subject: 'Документ',
+        html: `<p>${textEmail}</p>`,
         attachments: [
             {
                 filename: fileName,
                 content: file.buffer, // Використання буфера для контенту файлу
                 contentType: file.mimetype, // Встановлення коректного типу MIME
-            },
-            {
-                filename: 'Інструкція підписання документа за допомогою Дії.docx', // Назва файлу, який буде прикріплений
-                path: additionalFilePath, // Абсолютний шлях до файлу
-                contentType:
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // MIME тип
             },
         ],
         dsn: {
