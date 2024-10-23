@@ -1,5 +1,5 @@
 export interface ResultParseFile {
-    result: boolean | string;
+    result: string;
     fileName: string;
     message: string;
     messageId?: string;
