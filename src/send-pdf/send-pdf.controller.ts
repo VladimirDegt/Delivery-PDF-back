@@ -20,7 +20,6 @@ import { UsersService } from '../users/users.service';
 import { logger } from '../logger/pino-logger.service';
 import EmailValidationDTO from './dto/validate-email.dto';
 import { validate } from 'class-validator';
-import { ResultParseFile } from './types/result-parse-file';
 
 @ApiTags('Відправка файлів PDF на пошту')
 @Controller('files')
@@ -63,10 +62,9 @@ export class SendPdfController {
                     continue;
                 }
 
-                const resultParse = await this.sendPdfService.getEmail(file, decodedFileName);
-                const actEmail: ResultParseFile = JSON.parse(JSON.stringify(resultParse));
+                const actEmail = await this.sendPdfService.getEmail(file, decodedFileName);
 
-                logger.log(`actEmail: ${JSON.stringify(actEmail)}`, 'send-pdf-controller');
+                logger.log(`actEmail: ${actEmail.message}`, 'send-pdf-controller');
 
                 if (!actEmail.result) {
                     logger.error('Email not found', 'send-pdf-controller');
