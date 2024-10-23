@@ -25,9 +25,20 @@ async function bootstrap() {
 
     // Swagger
     const config = new DocumentBuilder()
-        .setTitle('Backend SendMyPDF')
+        .setTitle('Backend DeliveryPDF')
         .setDescription('API description')
         .setVersion('0.1')
+        .addBearerAuth(
+            {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+                name: 'JWT',
+                description: 'Enter JWT token',
+                in: 'header',
+            },
+            'JWT-auth'
+        )
         .build();
     const document = SwaggerModule.createDocument(app, config);
 
