@@ -44,6 +44,8 @@ export class SendPdfService {
 
             await unlinkFileAsync(filePath);
 
+            logger.log(`getEmail: ${matchEmail[1]}`, 'function getEmail');
+
             return {
                 result: matchEmail[1],
                 fileName: decodedFileName,
