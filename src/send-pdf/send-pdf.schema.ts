@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../users/user.schema';
 
 export type ActDocument = HydratedDocument<Act>;
 
@@ -13,11 +14,10 @@ export type ActDocument = HydratedDocument<Act>;
 })
 export class Act {
     @ApiProperty({
-        example: 'Volodymyr',
-        description: 'user name',
+        description: 'id користувача',
     })
-    @Prop()
-    user: string;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+    user: User;
 
     @ApiProperty({
         example: 'example@gmail.com',

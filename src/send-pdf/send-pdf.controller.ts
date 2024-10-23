@@ -47,7 +47,6 @@ export class SendPdfController {
         const findToken = await this.tokenService.getByName(token);
         const userId = await this.usersService.getUserByIdToken(findToken._id);
         if (!userId) throw new BadRequestException('Незареєстрований користувач');
-        const user = await this.usersService.getUserByID(userId);
 
         try {
             for (const file of files) {
@@ -58,7 +57,7 @@ export class SendPdfController {
                         fileName: decodedFileName,
                         emailTo: body.emailTo,
                         textEmail: body.textEmail,
-                        user: user.username,
+                        user: userId,
                     });
                     continue;
                 }
@@ -72,7 +71,7 @@ export class SendPdfController {
                         textEmail: body.textEmail,
                         fileName: actEmail.fileName,
                         result: 'Email not found',
-                        user: user.username,
+                        user: userId,
                     });
                     await act.save();
                     continue;
@@ -87,7 +86,7 @@ export class SendPdfController {
                         textEmail: body.textEmail,
                         fileName: actEmail.fileName,
                         result: 'Format email is incorrect',
-                        user: user.username,
+                        user: userId,
                     });
                     await act.save();
                     continue;
@@ -99,7 +98,7 @@ export class SendPdfController {
                         fileName: actEmail.fileName,
                         emailTo: actEmail.result,
                         textEmail: body.textEmail,
-                        user: user.username,
+                        user: userId,
                     });
                 }
             }

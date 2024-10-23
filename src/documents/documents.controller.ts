@@ -4,6 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { UsersService } from '../users/users.service';
 import { DocumentsService } from './documents.service';
+import { GetDocumentByDateDto } from './dto/get-document-by-date.dto';
 
 @ApiTags('Робота з документами')
 @Controller('document')
@@ -28,7 +29,7 @@ export class DocumentsController {
         const userId = await this.usersService.getUserByIdToken(findToken._id);
         if (!userId) throw new BadRequestException('Незареєстрований користувач');
 
-        return await this.documentsService.getTodayDocuments();
+        return await this.documentsService.getTodayDocuments(userId);
     }
 
     @ApiOperation({ summary: 'Отримання документів за вказану дату' })
@@ -38,7 +39,7 @@ export class DocumentsController {
     @Post('date')
     async getDocumentByDate(
         @Headers('authorization') authHeader: string,
-        @Body() body: { date: string }
+        @Body() body: { dates: GetDocumentByDateDto }
     ) {
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             throw new BadRequestException('Authorization token is missing or invalid');
@@ -48,7 +49,7 @@ export class DocumentsController {
         const userId = await this.usersService.getUserByIdToken(findToken._id);
         if (!userId) throw new BadRequestException('Незареєстрований користувач');
         try {
-            return await this.documentsService.getDocuments(body.date);
+            return await this.documentsService.getDocuments(body.dates, userId);
         } catch (_) {
             throw new BadRequestException({ error: 'Format date is wrong' });
         }
