@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import * as fs from 'fs';
-import { promisify } from 'util';
+import * as fs from 'fs/promises';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -30,35 +29,32 @@ export class SendPdfService {
             throw new BadRequestException('Невірне розширення або розмір більше 5Mb');
         }
 
-        const writeFileAsync = promisify(fs.writeFile);
-        const unlinkFileAsync = promisify(fs.unlink);
+        const dirPath = path.join(__dirname, 'files');
+        const filePath = path.join(dirPath, decodedFileName);
 
         try {
-            const filePath = path.join(__dirname, 'files', decodedFileName);
-            const dirPath = path.join(__dirname, 'files');
-            if (!fs.existsSync(dirPath)) {
-                fs.mkdirSync(dirPath, { recursive: true });
-            }
+            await fs.mkdir(dirPath, { recursive: true });
 
-            await writeFileAsync(filePath, file.buffer);
+            await fs.writeFile(filePath, file.buffer);
+
             const parseData = await pdfParse(filePath);
             const textPDF = parseData.text.trim();
 
             const regexEmail = /e-mail: ([^\s]+)/;
             const matchEmail = textPDF.match(regexEmail);
 
-            await unlinkFileAsync(filePath);
+            await fs.unlink(filePath);
 
             return {
-                result: matchEmail[1],
+                result: matchEmail ? matchEmail[1] : '',
                 fileName: decodedFileName,
-                message: 'Email found',
+                message: matchEmail ? 'Email found' : 'Email not found',
             };
         } catch (_) {
             return {
                 result: '',
                 fileName: decodedFileName,
-                message: `Error processing the file or the email value could not be found`,
+                message: 'Error processing the file or the email value could not be found',
             };
         }
     }
