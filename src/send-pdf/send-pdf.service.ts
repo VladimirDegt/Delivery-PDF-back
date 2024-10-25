@@ -34,7 +34,7 @@ export class SendPdfService {
         const unlinkFileAsync = promisify(fs.unlink);
 
         try {
-            const filePath = path.join('./src/public/files', decodedFileName);
+            const filePath = path.join('./public/files', decodedFileName);
             await writeFileAsync(filePath, file.buffer);
             const parseData = await pdfParse(filePath);
             const textPDF = parseData.text.trim();
