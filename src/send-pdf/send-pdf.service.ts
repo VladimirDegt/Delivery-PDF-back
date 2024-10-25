@@ -29,12 +29,11 @@ export class SendPdfService {
             throw new BadRequestException('Невірне розширення або розмір більше 5Mb');
         }
 
-        const dirPath = path.join(__dirname, 'files');
+        const dirPath = '/tmp';
         const filePath = path.join(dirPath, decodedFileName);
 
         try {
             try {
-                await fs.mkdir(dirPath, { recursive: true });
                 await fs.writeFile(filePath, file.buffer);
                 logger.log(`file.buffer: ${file.buffer}`, 'function getEmail');
             } catch (e) {
