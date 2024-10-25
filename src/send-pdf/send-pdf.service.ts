@@ -29,16 +29,13 @@ export class SendPdfService {
             throw new BadRequestException('Невірне розширення або розмір більше 5Mb');
         }
 
+        // Використовуємо /tmp як тимчасову директорію для запису файлів вимоги Versel
         const dirPath = '/tmp';
         const filePath = path.join(dirPath, decodedFileName);
 
         try {
-            try {
-                await fs.writeFile(filePath, file.buffer);
-                logger.log(`file.buffer: ${file.buffer}`, 'function getEmail');
-            } catch (e) {
-                logger.log(`error writing file: ${e}`, 'function getEmail');
-            }
+            await fs.mkdir(dirPath, { recursive: true });
+            await fs.writeFile(filePath, file.buffer);
 
             const parseData = await pdfParse(filePath);
             logger.log(`parseData: ${JSON.stringify(parseData)}`, 'function getEmail');

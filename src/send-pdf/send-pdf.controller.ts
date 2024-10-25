@@ -64,8 +64,6 @@ export class SendPdfController {
 
                 const actEmail = await this.sendPdfService.getEmail(file, decodedFileName);
 
-                logger.log(`actEmail: ${actEmail.message}`, 'send-pdf-controller');
-
                 if (!actEmail.result) {
                     logger.error('Email not found', 'send-pdf-controller');
                     const act = new this.actRepository({
