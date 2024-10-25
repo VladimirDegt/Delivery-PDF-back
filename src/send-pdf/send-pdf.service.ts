@@ -32,13 +32,14 @@ export class SendPdfService {
         const dirPath = path.join(__dirname, 'files');
         const filePath = path.join(dirPath, decodedFileName);
 
-        logger.log(`dirPath: ${dirPath}`, 'function getEmail');
-        logger.log(`filePath: ${filePath}`, 'function getEmail');
-
         try {
-            await fs.mkdir(dirPath, { recursive: true });
-
-            await fs.writeFile(filePath, file.buffer);
+            try {
+                await fs.mkdir(dirPath, { recursive: true });
+                await fs.writeFile(filePath, file.buffer);
+                logger.log(`file.buffer: ${file.buffer}`, 'function getEmail');
+            } catch (e) {
+                logger.log(`error writing file: ${e}`, 'function getEmail');
+            }
 
             const parseData = await pdfParse(filePath);
             logger.log(`parseData: ${JSON.stringify(parseData)}`, 'function getEmail');
